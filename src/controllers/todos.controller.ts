@@ -1,19 +1,15 @@
-import Response from '@/utils/response';
+import Response from '@/lib/response';
 import mockData from '@/mock';
 import { v4 as uuidV4 } from 'uuid';
+import { RouteMiddleware } from '@/lib/router';
 
 const resHandler = new Response();
 
 class TodoController {
-  private body;
-
-  constructor(body: string) {
-    this.body = body;
-  }
   /**
    * 取得 todos
    */
-  public getTodos = (_, res) => {
+  public getAllTodo: RouteMiddleware = (_, res) => {
     const handler = resHandler.handle(res);
     try {
       handler.status(200).json({ status: 'success', data: mockData }).end();
@@ -25,10 +21,10 @@ class TodoController {
   /**
    * 取得 todo
    */
-  public getTodo = (req, res) => {
+  public getTodo: RouteMiddleware = (_, res, { params }) => {
     const handler = resHandler.handle(res);
     try {
-      const id = req.params.id;
+      const id = params.id;
       const index = mockData.findIndex(d => d.id === id);
 
       if (index !== -1) {
@@ -47,12 +43,12 @@ class TodoController {
   /**
    * 修改 todo
    */
-  public updateTodo = (req, res) => {
+  public updateTodo: RouteMiddleware = (_, res, { params, body }) => {
     const handler = resHandler.handle(res);
     try {
-      const id = req.params.id;
+      const id = params.id;
       const index = mockData.findIndex(d => d.id === id);
-      const data = JSON.parse(this.body);
+      const data = JSON.parse(body);
 
       if (index !== -1 && data.content) {
         mockData[index].content = data.content;
@@ -71,10 +67,10 @@ class TodoController {
   /**
    * 新增 todo
    */
-  public addTodo = (_, res) => {
+  public addTodo: RouteMiddleware = (_, res, { body }) => {
     const handler = resHandler.handle(res);
     try {
-      const data = JSON.parse(this.body);
+      const data = JSON.parse(body);
 
       mockData.push({
         id: uuidV4(),
@@ -90,10 +86,10 @@ class TodoController {
   /**
    * 刪除 todo
    */
-  public deleteTodo = (req, res) => {
+  public deleteTodo: RouteMiddleware = (_, res, { params }) => {
     const handler = resHandler.handle(res);
     try {
-      const id = req.params.id;
+      const id = params.id;
       const index = mockData.findIndex(d => d.id === id);
 
       if (index !== -1) {
@@ -113,7 +109,7 @@ class TodoController {
   /**
    * 刪除全部 todo
    */
-  public deleteAllTodo = (_, res) => {
+  public deleteAllTodo: RouteMiddleware = (_, res) => {
     const handler = resHandler.handle(res);
     try {
       mockData.length = 0;

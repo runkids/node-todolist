@@ -1,26 +1,40 @@
 import * as http from 'http';
-import Router from '@/utils/router';
+import Router from '@/lib/router';
+import Response from '@/lib/response';
 
 class App {
   public port: string | number;
   public server: http.Server;
 
   constructor(routes) {
-    this.port = process.env.PORT || 3000;
-    this.server = http.createServer((req: http.IncomingMessage, res: http.ServerResponse) => {
-      let body = '';
-      const router = new Router(req, res);
+    const router = new Router();
+    this.port = process.env.PORT || 4000;
 
-      req.on('data', chunk => {
-        body += chunk;
-      });
-
-      req.on('end', () => {
-        routes.forEach(Route => {
-          new Route(router, body);
-        });
-      });
+    Response.setHeaders({
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, Content-Length, X-Requested-With',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,PATCH,DELETE',
+      'Content-Type': 'application/json',
     });
+
+    //註冊路由
+    routes.forEach(Route => {
+      new Route(router);
+    });
+
+    function requestListener(req: http.IncomingMessage, res: http.ServerResponse) {
+      let body = '';
+      req
+        .on('data', chunk => {
+          body += chunk;
+        })
+        .on('end', () => {
+          //執行註冊過的路由
+          router.runStack(req, res, body);
+        });
+    }
+
+    this.server = http.createServer(requestListener);
   }
 
   public listen() {

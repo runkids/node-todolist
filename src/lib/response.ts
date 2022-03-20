@@ -1,14 +1,13 @@
-import { ServerResponse } from 'http';
+import { ServerResponse, OutgoingHttpHeaders, OutgoingHttpHeader } from 'http';
 
-const HEADERS = {
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization, Content-Length, X-Requested-With',
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'PATCH, POST, GET,OPTIONS,DELETE',
-  'Content-Type': 'application/json',
-};
+let headers: OutgoingHttpHeaders | OutgoingHttpHeader[] = {};
 
 class Response {
   private res: ServerResponse;
+
+  static setHeaders(setting) {
+    headers = setting;
+  }
 
   public handle(res: ServerResponse) {
     this.res = res;
@@ -16,7 +15,7 @@ class Response {
   }
 
   public status(statusCode: number) {
-    this.res.writeHead(statusCode, HEADERS);
+    this.res.writeHead(statusCode, headers);
     return this;
   }
 
