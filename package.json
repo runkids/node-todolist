@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "description": "Node.js todo list API Sample 🏄‍♂️",
   "scripts": {
+    "tsc": "./node_modules/typescript/bin/tsc",
+    "tsc-alias": "./node_modules/typescript/bin/tsc-alias",
     "start": "npm run build && node dist/server.js",
     "dev": "nodemon",
-    "build": "tsc && tsc-alias",
+    "build": "npm run tsc && npm run tsc-alias",
     "lint": "eslint --ignore-path .gitignore --ext .ts src/",
     "lint:fix": "npm run lint -- --fix"
   },
