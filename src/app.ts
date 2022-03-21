@@ -1,6 +1,7 @@
 import * as http from 'http';
 import Router from '@/lib/router';
 import Response from '@/lib/response';
+import Request from '@/lib/request';
 
 class App {
   public port: string | number;
@@ -30,7 +31,7 @@ class App {
         })
         .on('end', () => {
           //執行註冊過的路由
-          router.runStack(req, res, body);
+          router.runStack(new Request(req, body), new Response(res));
         });
     }
 

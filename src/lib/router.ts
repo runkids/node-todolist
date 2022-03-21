@@ -1,27 +1,38 @@
-import { IncomingMessage, ServerResponse } from 'http';
 import Response from '@/lib/response';
+import Request from '@/lib/request';
+import { IncomingMessage } from 'http';
 import { match } from 'path-to-regexp';
-import { StatusCode } from '@/config';
+import { HttpStatus } from '@/config';
 
 type Methods = 'get' | 'options' | 'post' | 'delete' | 'patch';
-export type RouteMiddleware = (req: IncomingMessage, res: ServerResponse, { body: string, params: any }) => void;
 
-const resHandler = new Response();
+type PathMatchResult = { path: string; index: number; params: Record<string, any> };
+
+type MiddlewareRequest = Request & {
+  params: any;
+};
+
+type MiddlewareResponse = Response;
+
+export type RouteMiddleware = (req: MiddlewareRequest, res: MiddlewareResponse) => void;
 
 class Router {
-  private stack = [];
-  private request: IncomingMessage;
-  private response: ServerResponse;
+  private stack: Array<() => boolean> = [];
+  private request: Request;
+  private response: Response;
   private url: string;
   private method: Methods;
 
-  private pathMatcher(method: Methods, path: string, callback: RouteMiddleware) {
-    return (body: string) => {
+  private pathMatcher(method: Methods, path: string, callback: RouteMiddleware): () => boolean {
+    return () => {
       const pathMatch = match(path, { decode: decodeURIComponent });
-      if (this.method === method && pathMatch(this.url) !== false) {
+      const pathMatchResult = pathMatch(this.url) as unknown;
+
+      if (this.method === method && pathMatchResult !== false) {
         // parse params from request url
-        const { params } = pathMatch(this.url) as { path: string; index: number; params: Record<string, any> };
-        callback(this.request, this.response, { body, params });
+        const { params } = pathMatchResult as PathMatchResult;
+        this.request.params = params;
+        callback(this.request, this.response);
         return true;
       } else {
         return false;
@@ -50,26 +61,25 @@ class Router {
   }
 
   private pathNotFound() {
-    const resHandler = new Response();
-    resHandler.handle(this.response).status(StatusCode.NOT_FOUND).json({ status: 'failed', message: '無此網站路由' }).end();
+    this.response.status(HttpStatus.NOT_FOUND).json({ status: 'failed', message: '無此網站路由' }).end();
   }
 
-  public runStack(req, res, body: string) {
+  public runStack(req: Request, res: Response) {
     this.request = req;
     this.response = res;
     this.url = req.url;
     this.method = req.method.toLowerCase() as Methods;
 
     this.options(this.url, () => {
-      resHandler.handle(this.response).status(StatusCode.SUCCESS).end();
+      this.response.status(HttpStatus.OK).end();
     });
 
     let match = false;
     let idx = 0;
     //當有符合的路徑就不再執行 while ，全部都沒有符合就視為找不到路徑
-    while (match !== true && idx < this.stack.length) {
-      match = this.stack[idx](body);
-      if (match === true) {
+    while (!match && idx < this.stack.length) {
+      match = this.stack[idx]();
+      if (match) {
         continue;
       }
       idx++;

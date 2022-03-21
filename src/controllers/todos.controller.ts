@@ -1,109 +1,106 @@
-import Response from '@/lib/response';
 import mockData from '@/mock';
 import { v4 as uuidV4 } from 'uuid';
 import { RouteMiddleware } from '@/lib/router';
-import { StatusCode } from '@/config';
-
-const resHandler = new Response();
+import { HttpStatus } from '@/config';
 
 class TodoController {
   /**
    * 取得 todos
    */
   public getAllTodo: RouteMiddleware = (_, res) => {
-    const handler = resHandler.handle(res);
     try {
-      handler.status(StatusCode.SUCCESS).json({ status: 'success', data: mockData }).end();
+      res.status(HttpStatus.OK).json({ status: 'success', data: mockData }).end();
     } catch (error) {
-      handler.status(StatusCode.BAD_REQUEST).json({ status: 'failed', message: '失敗' }).end();
+      res.status(HttpStatus.BAD_REQUEST).json({ status: 'failed', message: '失敗' }).end();
     }
   };
 
   /**
    * 取得 todo
    */
-  public getTodo: RouteMiddleware = (_, res, { params }) => {
-    const handler = resHandler.handle(res);
+  public getTodo: RouteMiddleware = (req, res) => {
     try {
-      const id = params.id;
+      const id = req.params.id;
       const index = mockData.findIndex(d => d.id === id);
 
       if (index !== -1) {
-        handler.status(StatusCode.SUCCESS).json({ status: 'success', data: mockData[index] }).end();
+        res.status(HttpStatus.OK).json({ status: 'success', data: mockData[index] }).end();
       } else {
-        handler
-          .status(StatusCode.BAD_REQUEST)
+        res
+          .status(HttpStatus.BAD_REQUEST)
           .json({ status: 'failed', message: `查無此ID：${id}` })
           .end();
       }
     } catch (error) {
-      handler.status(StatusCode.BAD_REQUEST).json({ status: 'failed', message: '查詢失敗' }).end();
+      res.status(HttpStatus.BAD_REQUEST).json({ status: 'failed', message: '查詢失敗' }).end();
     }
   };
 
   /**
    * 修改 todo
    */
-  public updateTodo: RouteMiddleware = (_, res, { params, body }) => {
-    const handler = resHandler.handle(res);
+  public updateTodo: RouteMiddleware = (req, res) => {
     try {
-      const id = params.id;
+      const id = req.params.id;
       const index = mockData.findIndex(d => d.id === id);
-      const data = JSON.parse(body);
+      const data = JSON.parse(req.body);
 
       if (index !== -1 && data.content) {
         mockData[index].content = data.content;
-        handler.status(StatusCode.SUCCESS).json({ status: 'success', data: mockData[index] }).end();
+        res.status(HttpStatus.OK).json({ status: 'success', data: mockData[index] }).end();
       } else {
-        handler
-          .status(StatusCode.BAD_REQUEST)
+        res
+          .status(HttpStatus.BAD_REQUEST)
           .json({ status: 'failed', message: data.content ? `查無此ID：${id}` : '資料格式錯誤' })
           .end();
       }
     } catch (error) {
-      handler.status(StatusCode.BAD_REQUEST).json({ status: 'failed', message: '修改失敗' }).end();
+      res.status(HttpStatus.BAD_REQUEST).json({ status: 'failed', message: '修改失敗' }).end();
     }
   };
 
   /**
    * 新增 todo
    */
-  public addTodo: RouteMiddleware = (_, res, { body }) => {
-    const handler = resHandler.handle(res);
+  public addTodo: RouteMiddleware = (req, res) => {
     try {
-      const data = JSON.parse(body);
+      const data = JSON.parse(req.body);
+
+      if (!data || !data.content) {
+        res.status(HttpStatus.BAD_REQUEST).json({ status: 'failed', message: '新增失敗，資料格式有誤' }).end();
+        return;
+      }
 
       mockData.push({
         id: uuidV4(),
         content: data.content,
       });
 
-      handler.status(StatusCode.SUCCESS).json({ status: 'success', message: '新增成功', data: mockData }).end();
+      res.status(HttpStatus.OK).json({ status: 'success', message: '新增成功', data: mockData }).end();
     } catch (error) {
-      handler.status(StatusCode.BAD_REQUEST).json({ status: 'failed', message: '新增失敗' }).end();
+      res.status(HttpStatus.BAD_REQUEST).json({ status: 'failed', message: '新增失敗' }).end();
     }
   };
 
   /**
    * 刪除 todo
    */
-  public deleteTodo: RouteMiddleware = (_, res, { params }) => {
-    const handler = resHandler.handle(res);
+  public deleteTodo: RouteMiddleware = (req, res) => {
     try {
-      const id = params.id;
+      const id = req.params.id;
       const index = mockData.findIndex(d => d.id === id);
 
       if (index !== -1) {
         mockData.splice(index, 1);
-        handler.status(StatusCode.SUCCESS).json({ status: 'success', data: mockData }).end();
+        res.status(HttpStatus.OK).json({ status: 'success', data: mockData }).end();
       } else {
-        handler
-          .status(StatusCode.BAD_REQUEST)
+        res
+          .status(HttpStatus.BAD_REQUEST)
           .json({ status: 'failed', message: `查無此ID：${id}` })
           .end();
       }
     } catch (error) {
-      handler.status(StatusCode.BAD_REQUEST).json({ status: 'failed', message: '刪除失敗' }).end();
+      res.status(HttpStatus.BAD_REQUEST).json({ status: 'failed', message: '刪除失敗' }).end();
     }
   };
 
@@ -111,12 +108,11 @@ class TodoController {
    * 刪除全部 todo
    */
   public deleteAllTodo: RouteMiddleware = (_, res) => {
-    const handler = resHandler.handle(res);
     try {
       mockData.length = 0;
-      handler.status(StatusCode.SUCCESS).json({ status: 'success', data: mockData }).end();
+      res.status(HttpStatus.OK).json({ status: 'success', data: mockData }).end();
     } catch (error) {
-      handler.status(StatusCode.BAD_REQUEST).json({ status: 'failed', message: '刪除失敗' }).end();
+      res.status(HttpStatus.BAD_REQUEST).json({ status: 'failed', message: '刪除失敗' }).end();
     }
   };
 }
