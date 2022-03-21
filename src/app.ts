@@ -30,7 +30,9 @@ class App {
         })
         .on('end', () => {
           //執行註冊過的路由
-          router.runStack(req, res, body);
+          const REQ = Object.assign(req, { body });
+          const RES = new Response(res);
+          router.runStack(REQ, RES);
         });
     }
 
