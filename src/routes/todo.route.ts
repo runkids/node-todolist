@@ -1,11 +1,10 @@
 import TodoController from '@/controllers/todos.controller';
 import Router from '@/lib/router';
+import BaseRoute from '@/lib/route';
 
-class TodoRoute {
-  public path = '/todos';
-  private controller: TodoController = new TodoController();
-
+class TodoRoute extends BaseRoute<TodoController> {
   constructor(private readonly router: Router) {
+    super('/todos', new TodoController());
     this.initializeRoutes();
   }
 
