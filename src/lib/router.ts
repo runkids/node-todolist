@@ -1,6 +1,7 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import Response from '@/lib/response';
 import { match } from 'path-to-regexp';
+import { StatusCode } from '@/config';
 
 type Methods = 'get' | 'options' | 'post' | 'delete' | 'patch';
 export type RouteMiddleware = (req: IncomingMessage, res: ServerResponse, { body: string, params: any }) => void;
@@ -50,7 +51,7 @@ class Router {
 
   private pathNotFound() {
     const resHandler = new Response();
-    resHandler.handle(this.response).status(404).json({ status: 'failed', message: '無此網站路由' }).end();
+    resHandler.handle(this.response).status(StatusCode.NOT_FOUND).json({ status: 'failed', message: '無此網站路由' }).end();
   }
 
   public runStack(req, res, body: string) {
@@ -60,7 +61,7 @@ class Router {
     this.method = req.method.toLowerCase() as Methods;
 
     this.options(this.url, () => {
-      resHandler.handle(this.response).status(200).end();
+      resHandler.handle(this.response).status(StatusCode.SUCCESS).end();
     });
 
     let match = false;

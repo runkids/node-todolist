@@ -2,6 +2,7 @@ import Response from '@/lib/response';
 import mockData from '@/mock';
 import { v4 as uuidV4 } from 'uuid';
 import { RouteMiddleware } from '@/lib/router';
+import { StatusCode } from '@/config';
 
 const resHandler = new Response();
 
@@ -12,9 +13,9 @@ class TodoController {
   public getAllTodo: RouteMiddleware = (_, res) => {
     const handler = resHandler.handle(res);
     try {
-      handler.status(200).json({ status: 'success', data: mockData }).end();
+      handler.status(StatusCode.SUCCESS).json({ status: 'success', data: mockData }).end();
     } catch (error) {
-      handler.status(400).json({ status: 'failed', message: '失敗' }).end();
+      handler.status(StatusCode.BAD_REQUEST).json({ status: 'failed', message: '失敗' }).end();
     }
   };
 
@@ -28,15 +29,15 @@ class TodoController {
       const index = mockData.findIndex(d => d.id === id);
 
       if (index !== -1) {
-        handler.status(200).json({ status: 'success', data: mockData[index] }).end();
+        handler.status(StatusCode.SUCCESS).json({ status: 'success', data: mockData[index] }).end();
       } else {
         handler
-          .status(400)
+          .status(StatusCode.BAD_REQUEST)
           .json({ status: 'failed', message: `查無此ID：${id}` })
           .end();
       }
     } catch (error) {
-      handler.status(400).json({ status: 'failed', message: '查詢失敗' }).end();
+      handler.status(StatusCode.BAD_REQUEST).json({ status: 'failed', message: '查詢失敗' }).end();
     }
   };
 
@@ -52,15 +53,15 @@ class TodoController {
 
       if (index !== -1 && data.content) {
         mockData[index].content = data.content;
-        handler.status(200).json({ status: 'success', data: mockData[index] }).end();
+        handler.status(StatusCode.SUCCESS).json({ status: 'success', data: mockData[index] }).end();
       } else {
         handler
-          .status(400)
+          .status(StatusCode.BAD_REQUEST)
           .json({ status: 'failed', message: data.content ? `查無此ID：${id}` : '資料格式錯誤' })
           .end();
       }
     } catch (error) {
-      handler.status(400).json({ status: 'failed', message: '修改失敗' }).end();
+      handler.status(StatusCode.BAD_REQUEST).json({ status: 'failed', message: '修改失敗' }).end();
     }
   };
 
@@ -77,9 +78,9 @@ class TodoController {
         content: data.content,
       });
 
-      handler.status(200).json({ status: 'success', message: '新增成功', data: mockData }).end();
+      handler.status(StatusCode.SUCCESS).json({ status: 'success', message: '新增成功', data: mockData }).end();
     } catch (error) {
-      handler.status(400).json({ status: 'failed', message: '新增失敗' }).end();
+      handler.status(StatusCode.BAD_REQUEST).json({ status: 'failed', message: '新增失敗' }).end();
     }
   };
 
@@ -94,15 +95,15 @@ class TodoController {
 
       if (index !== -1) {
         mockData.splice(index, 1);
-        handler.status(200).json({ status: 'success', data: mockData }).end();
+        handler.status(StatusCode.SUCCESS).json({ status: 'success', data: mockData }).end();
       } else {
         handler
-          .status(400)
+          .status(StatusCode.BAD_REQUEST)
           .json({ status: 'failed', message: `查無此ID：${id}` })
           .end();
       }
     } catch (error) {
-      handler.status(400).json({ status: 'failed', message: '刪除失敗' }).end();
+      handler.status(StatusCode.BAD_REQUEST).json({ status: 'failed', message: '刪除失敗' }).end();
     }
   };
 
@@ -113,9 +114,9 @@ class TodoController {
     const handler = resHandler.handle(res);
     try {
       mockData.length = 0;
-      handler.status(200).json({ status: 'success', data: mockData }).end();
+      handler.status(StatusCode.SUCCESS).json({ status: 'success', data: mockData }).end();
     } catch (error) {
-      handler.status(400).json({ status: 'failed', message: '刪除失敗' }).end();
+      handler.status(StatusCode.BAD_REQUEST).json({ status: 'failed', message: '刪除失敗' }).end();
     }
   };
 }
