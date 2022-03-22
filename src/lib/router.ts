@@ -4,8 +4,8 @@ import { match, Match } from 'path-to-regexp';
 import { HttpStatus } from '@/config';
 
 type Methods = 'get' | 'options' | 'post' | 'delete' | 'patch';
-type PathMatcher = (method: Methods, path: string, middleware: RouteMiddleware) => () => boolean;
-export type RouteMiddleware = (req: Request, res: Response) => void;
+type PathMatcher = (method: Methods, path: string, middleware: RouteHandler) => () => boolean;
+export type RouteHandler = (req: Request, res: Response) => void;
 
 class Router {
   private stack: Array<() => boolean> = [];
@@ -14,7 +14,7 @@ class Router {
   private url: string;
   private method: Methods;
 
-  private pathMatcher: PathMatcher = (method, path, middleware) => {
+  private pathMatcher: PathMatcher = (method, path, handler) => {
     return () => {
       const pathMatch = match(path, { decode: decodeURIComponent });
       const pathMatchResult: Match = pathMatch(this.url);
@@ -23,7 +23,7 @@ class Router {
         this.request.params = pathMatchResult.params;
 
         try {
-          middleware(this.request, this.response);
+          handler(this.request, this.response);
         } catch (e) {
           // 共用錯誤捕捉
           this.errorHandler(e);
@@ -36,24 +36,24 @@ class Router {
     };
   };
 
-  public options(path: string, middleware: RouteMiddleware) {
-    this.stack.push(this.pathMatcher('options', path, middleware));
+  public options(path: string, handler: RouteHandler) {
+    this.stack.push(this.pathMatcher('options', path, handler));
   }
 
-  public get(path: string, middleware: RouteMiddleware) {
-    this.stack.push(this.pathMatcher('get', path, middleware));
+  public get(path: string, handler: RouteHandler) {
+    this.stack.push(this.pathMatcher('get', path, handler));
   }
 
-  public post(path: string, middleware: RouteMiddleware) {
-    this.stack.push(this.pathMatcher('post', path, middleware));
+  public post(path: string, handler: RouteHandler) {
+    this.stack.push(this.pathMatcher('post', path, handler));
   }
 
-  public patch(path: string, middleware: RouteMiddleware) {
-    this.stack.push(this.pathMatcher('patch', path, middleware));
+  public patch(path: string, handler: RouteHandler) {
+    this.stack.push(this.pathMatcher('patch', path, handler));
   }
 
-  public delete(path: string, middleware: RouteMiddleware) {
-    this.stack.push(this.pathMatcher('delete', path, middleware));
+  public delete(path: string, handler: RouteHandler) {
+    this.stack.push(this.pathMatcher('delete', path, handler));
   }
 
   private pathNotFound() {

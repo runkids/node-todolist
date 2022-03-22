@@ -9,8 +9,13 @@ class Response {
     this.res = res;
   }
 
-  static setHeaders(setting: Record<string, any>) {
+  static initHeaders(setting: Record<string, any>) {
     headers = setting;
+  }
+
+  public headers(setting: Record<string, any>) {
+    headers = setting;
+    return this;
   }
 
   public status(statusCode: number) {
