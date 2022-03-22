@@ -20,7 +20,7 @@ class Response {
 
   public json(body: Record<string, any>) {
     this.res.write(JSON.stringify(body));
-    return this;
+    this.end();
   }
 
   public end() {

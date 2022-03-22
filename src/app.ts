@@ -4,7 +4,6 @@ import Response from '@/lib/response';
 import Request from '@/lib/request';
 
 class App {
-  public port: string | number;
   public server: http.Server;
 
   constructor(routes) {
@@ -37,7 +36,7 @@ class App {
     this.server = http.createServer(requestListener);
   }
 
-  public listen(port) {
+  public listen(port: string | number) {
     this.server.listen(port, () => {
       console.info(`=================================`);
       console.info(`🚀 App listening on the port ${port}`);

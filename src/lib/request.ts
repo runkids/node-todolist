@@ -1,10 +1,10 @@
 import { IncomingMessage } from 'http';
 
 class Request {
-  private req: IncomingMessage & { body: string; params?: any };
+  private req: IncomingMessage & { body: string; params: Record<string, any> };
 
   constructor(req: IncomingMessage, body: string) {
-    this.req = Object.assign(req, { body });
+    this.req = Object.assign(req, { body, params: {} });
   }
 
   set params(params) {

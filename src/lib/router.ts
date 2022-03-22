@@ -22,7 +22,12 @@ class Router {
       if (this.method === method && pathMatchResult !== false) {
         this.request.params = pathMatchResult.params;
 
-        middleware(this.request, this.response);
+        try {
+          middleware(this.request, this.response);
+        } catch (e) {
+          // 共用錯誤捕捉
+          this.errorHandler(e);
+        }
 
         return true;
       } else {
@@ -52,7 +57,11 @@ class Router {
   }
 
   private pathNotFound() {
-    this.response.status(HttpStatus.NOT_FOUND).json({ status: 'failed', message: '無此網站路由' }).end();
+    this.response.status(HttpStatus.NOT_FOUND).json({ status: 'failed', message: '無此網站路由' });
+  }
+
+  private errorHandler(error) {
+    this.response.status(HttpStatus.BAD_REQUEST).json({ status: 'failed', message: `${error}` });
   }
 
   public runStack(req: Request, res: Response) {
