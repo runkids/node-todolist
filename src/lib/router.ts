@@ -19,10 +19,12 @@ class Router {
       const pathMatchResult: Match = pathMatch(this.url);
 
       if (this.method === method && pathMatchResult !== false) {
-        // parse params from request url
         const { params } = pathMatchResult;
+
         this.request.params = params;
+
         middleware(this.request, this.response);
+
         return true;
       } else {
         return false;

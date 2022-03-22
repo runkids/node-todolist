@@ -11,7 +11,10 @@ class TodoController {
     try {
       res.status(HttpStatus.OK).json({ status: 'success', data: mockData }).end();
     } catch (error) {
-      res.status(HttpStatus.BAD_REQUEST).json({ status: 'failed', message: '失敗' }).end();
+      res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ status: 'failed', message: `查詢失敗: ${error}` })
+        .end();
     }
   };
 
@@ -32,7 +35,10 @@ class TodoController {
           .end();
       }
     } catch (error) {
-      res.status(HttpStatus.BAD_REQUEST).json({ status: 'failed', message: '查詢失敗' }).end();
+      res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ status: 'failed', message: `查詢失敗: ${error}` })
+        .end();
     }
   };
 
@@ -55,7 +61,10 @@ class TodoController {
           .end();
       }
     } catch (error) {
-      res.status(HttpStatus.BAD_REQUEST).json({ status: 'failed', message: '修改失敗' }).end();
+      res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ status: 'failed', message: `修改失敗: ${error}` })
+        .end();
     }
   };
 
@@ -78,7 +87,10 @@ class TodoController {
 
       res.status(HttpStatus.OK).json({ status: 'success', message: '新增成功', data: mockData }).end();
     } catch (error) {
-      res.status(HttpStatus.BAD_REQUEST).json({ status: 'failed', message: '新增失敗' }).end();
+      res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ status: 'failed', message: `新增失敗: ${error}` })
+        .end();
     }
   };
 
@@ -100,7 +112,10 @@ class TodoController {
           .end();
       }
     } catch (error) {
-      res.status(HttpStatus.BAD_REQUEST).json({ status: 'failed', message: '刪除失敗' }).end();
+      res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ status: 'failed', message: `刪除失敗: ${error}` })
+        .end();
     }
   };
 
@@ -112,7 +127,10 @@ class TodoController {
       mockData.length = 0;
       res.status(HttpStatus.OK).json({ status: 'success', data: mockData }).end();
     } catch (error) {
-      res.status(HttpStatus.BAD_REQUEST).json({ status: 'failed', message: '刪除失敗' }).end();
+      res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ status: 'failed', message: `刪除失敗: ${error}` })
+        .end();
     }
   };
 }
