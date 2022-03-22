@@ -4,14 +4,7 @@ import { match, Match } from 'path-to-regexp';
 import { HttpStatus } from '@/config';
 
 type Methods = 'get' | 'options' | 'post' | 'delete' | 'patch';
-
-type MiddlewareRequest = Request & {
-  params: any;
-};
-
-type MiddlewareResponse = Response;
-
-export type RouteMiddleware = (req: MiddlewareRequest, res: MiddlewareResponse) => void;
+export type RouteMiddleware = (req: Request, res: Response) => void;
 
 class Router {
   private stack: Array<() => boolean> = [];
