@@ -9,7 +9,7 @@ class Response {
     this.serverResponse = res;
   }
 
-  static setHeaders(setting) {
+  static setHeaders(setting: Record<string, any>) {
     headers = setting;
   }
 

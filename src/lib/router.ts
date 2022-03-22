@@ -1,21 +1,10 @@
 import Response from '@/lib/response';
-import { IncomingMessage } from 'http';
-import { match } from 'path-to-regexp';
+import Request from '@/lib/request';
+import { match, Match } from 'path-to-regexp';
 import { HttpStatus } from '@/config';
 
 type Methods = 'get' | 'options' | 'post' | 'delete' | 'patch';
-
-type Request = IncomingMessage & { body: string };
-
-type PathMatchResult = { path: string; index: number; params: Record<string, any> };
-
-type MiddleWareRequest = Request & {
-  params: any;
-};
-
-type MiddleWareResponse = Response;
-
-export type RouteMiddleware = (req: MiddleWareRequest, res: MiddleWareResponse) => void;
+export type RouteMiddleware = (req: Request, res: Response) => void;
 
 class Router {
   private stack: Array<() => boolean> = [];
@@ -24,18 +13,17 @@ class Router {
   private url: string;
   private method: Methods;
 
-  private pathMatcher(method: Methods, path: string, callback: RouteMiddleware): () => boolean {
+  private pathMatcher(method: Methods, path: string, middleware: RouteMiddleware): () => boolean {
     return () => {
       const pathMatch = match(path, { decode: decodeURIComponent });
-      const pathMatchResult = pathMatch(this.url) as unknown;
+      const pathMatchResult: Match = pathMatch(this.url);
 
       if (this.method === method && pathMatchResult !== false) {
-        // parse params from request url
-        const { params } = pathMatchResult as PathMatchResult;
-        const req = Object.assign(this.request, { params });
-        const res = this.response;
+        const { params } = pathMatchResult;
 
-        callback(req, res);
+        this.request.params = params;
+
+        middleware(this.request, this.response);
 
         return true;
       } else {
@@ -44,24 +32,24 @@ class Router {
     };
   }
 
-  public options(path: string, callback: RouteMiddleware) {
-    this.stack.push(this.pathMatcher('options', path, callback));
+  public options(path: string, middleware: RouteMiddleware) {
+    this.stack.push(this.pathMatcher('options', path, middleware));
   }
 
-  public get(path: string, callback: RouteMiddleware) {
-    this.stack.push(this.pathMatcher('get', path, callback));
+  public get(path: string, middleware: RouteMiddleware) {
+    this.stack.push(this.pathMatcher('get', path, middleware));
   }
 
-  public post(path: string, callback: RouteMiddleware) {
-    this.stack.push(this.pathMatcher('post', path, callback));
+  public post(path: string, middleware: RouteMiddleware) {
+    this.stack.push(this.pathMatcher('post', path, middleware));
   }
 
-  public patch(path: string, callback: RouteMiddleware) {
-    this.stack.push(this.pathMatcher('patch', path, callback));
+  public patch(path: string, middleware: RouteMiddleware) {
+    this.stack.push(this.pathMatcher('patch', path, middleware));
   }
 
-  public delete(path: string, callback: RouteMiddleware) {
-    this.stack.push(this.pathMatcher('delete', path, callback));
+  public delete(path: string, middleware: RouteMiddleware) {
+    this.stack.push(this.pathMatcher('delete', path, middleware));
   }
 
   private pathNotFound() {

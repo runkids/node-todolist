@@ -1,6 +1,7 @@
 import * as http from 'http';
 import Router from '@/lib/router';
 import Response from '@/lib/response';
+import Request from '@/lib/request';
 
 class App {
   public port: string | number;
@@ -8,7 +9,6 @@ class App {
 
   constructor(routes) {
     const router = new Router();
-    this.port = process.env.PORT || 4000;
 
     Response.setHeaders({
       'Access-Control-Allow-Headers': 'Content-Type, Authorization, Content-Length, X-Requested-With',
@@ -30,19 +30,17 @@ class App {
         })
         .on('end', () => {
           //執行註冊過的路由
-          const REQ = Object.assign(req, { body });
-          const RES = new Response(res);
-          router.runStack(REQ, RES);
+          router.runStack(new Request(req, body), new Response(res));
         });
     }
 
     this.server = http.createServer(requestListener);
   }
 
-  public listen() {
-    this.server.listen(this.port, () => {
+  public listen(port) {
+    this.server.listen(port, () => {
       console.info(`=================================`);
-      console.info(`🚀 App listening on the port ${this.port}`);
+      console.info(`🚀 App listening on the port ${port}`);
       console.info(`=================================`);
     });
   }
