@@ -9,7 +9,6 @@ class App {
 
   constructor(routes) {
     const router = new Router();
-    this.port = process.env.PORT || 4000;
 
     Response.setHeaders({
       'Access-Control-Allow-Headers': 'Content-Type, Authorization, Content-Length, X-Requested-With',
@@ -38,10 +37,10 @@ class App {
     this.server = http.createServer(requestListener);
   }
 
-  public listen() {
-    this.server.listen(this.port, () => {
+  public listen(port) {
+    this.server.listen(port, () => {
       console.info(`=================================`);
-      console.info(`🚀 App listening on the port ${this.port}`);
+      console.info(`🚀 App listening on the port ${port}`);
       console.info(`=================================`);
     });
   }
