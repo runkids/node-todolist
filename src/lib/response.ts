@@ -3,10 +3,10 @@ import { ServerResponse, OutgoingHttpHeaders, OutgoingHttpHeader } from 'http';
 let headers: OutgoingHttpHeaders | OutgoingHttpHeader[] = {};
 
 class Response {
-  private serverResponse: ServerResponse;
+  private res: ServerResponse;
 
   constructor(res: ServerResponse) {
-    this.serverResponse = res;
+    this.res = res;
   }
 
   static setHeaders(setting: Record<string, any>) {
@@ -14,17 +14,17 @@ class Response {
   }
 
   public status(statusCode: number) {
-    this.serverResponse.writeHead(statusCode, headers);
+    this.res.writeHead(statusCode, headers);
     return this;
   }
 
-  public json(resBody: Record<string, any>) {
-    this.serverResponse.write(JSON.stringify(resBody));
+  public json(body: Record<string, any>) {
+    this.res.write(JSON.stringify(body));
     return this;
   }
 
   public end() {
-    this.serverResponse.end();
+    this.res.end();
   }
 }
 

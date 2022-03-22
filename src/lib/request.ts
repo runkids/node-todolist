@@ -3,7 +3,7 @@ import { IncomingMessage } from 'http';
 class Request {
   private req: IncomingMessage & { body: string; params?: any };
 
-  constructor(req: IncomingMessage, body?: string) {
+  constructor(req: IncomingMessage, body: string) {
     this.req = Object.assign(req, { body });
   }
 
