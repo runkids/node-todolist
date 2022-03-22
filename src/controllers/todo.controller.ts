@@ -108,7 +108,7 @@ class TodoController {
       } else {
         res
           .status(HttpStatus.BAD_REQUEST)
-          .json({ status: 'failed', message: `查無此ID：${id}` })
+          .json({ status: 'failed', message: `查無此ID: ${id}` })
           .end();
       }
     } catch (error) {

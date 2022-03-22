@@ -1,4 +1,4 @@
-import TodoController from '@/controllers/todos.controller';
+import TodoController from '@/controllers/todo.controller';
 import Router from '@/lib/router';
 import BaseRoute from '@/lib/route';
 

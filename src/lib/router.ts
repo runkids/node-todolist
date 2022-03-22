@@ -4,6 +4,7 @@ import { match, Match } from 'path-to-regexp';
 import { HttpStatus } from '@/config';
 
 type Methods = 'get' | 'options' | 'post' | 'delete' | 'patch';
+type PathMatcher = (method: Methods, path: string, middleware: RouteMiddleware) => () => boolean;
 export type RouteMiddleware = (req: Request, res: Response) => void;
 
 class Router {
@@ -13,7 +14,7 @@ class Router {
   private url: string;
   private method: Methods;
 
-  private pathMatcher(method: Methods, path: string, middleware: RouteMiddleware): () => boolean {
+  private pathMatcher: PathMatcher = (method, path, middleware) => {
     return () => {
       const pathMatch = match(path, { decode: decodeURIComponent });
       const pathMatchResult: Match = pathMatch(this.url);
@@ -30,7 +31,7 @@ class Router {
         return false;
       }
     };
-  }
+  };
 
   public options(path: string, middleware: RouteMiddleware) {
     this.stack.push(this.pathMatcher('options', path, middleware));
