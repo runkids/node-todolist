@@ -3,8 +3,8 @@ import Request from '@/lib/request';
 import { match, Match } from 'path-to-regexp';
 import { HttpStatus } from '@/config';
 
-type Methods = 'get' | 'options' | 'post' | 'delete' | 'patch';
-type PathMatcher = (method: Methods, path: string, middleware: RouteHandler) => () => boolean;
+type Method = 'get' | 'options' | 'post' | 'delete' | 'patch';
+type PathMatcher = (method: Method, path: string, middleware: RouteHandler) => () => boolean;
 export type RouteHandler = (req: Request, res: Response) => void;
 
 class Router {
@@ -12,7 +12,7 @@ class Router {
   private request: Request;
   private response: Response;
   private url: string;
-  private method: Methods;
+  private method: Method;
 
   private pathMatcher: PathMatcher = (method, path, handler) => {
     return () => {
@@ -68,7 +68,7 @@ class Router {
     this.request = req;
     this.response = res;
     this.url = req.url;
-    this.method = req.method.toLowerCase() as Methods;
+    this.method = req.method.toLowerCase() as Method;
 
     this.options(this.url, () => {
       this.response.status(HttpStatus.OK).end();

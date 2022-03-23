@@ -1,20 +1,20 @@
 import mockData from '@/mock';
 import { v4 as uuidV4 } from 'uuid';
-import { RouteMiddleware } from '@/lib/router';
+import { RouteHandler } from '@/lib/router';
 import { HttpStatus } from '@/config';
 
 class TodoController {
   /**
    * 取得 todos
    */
-  public getAllTodo: RouteMiddleware = (_, res) => {
+  public getAllTodo: RouteHandler = (_, res) => {
     res.status(HttpStatus.OK).json({ status: 'success', data: mockData });
   };
 
   /**
    * 取得 todo
    */
-  public getTodo: RouteMiddleware = (req, res) => {
+  public getTodo: RouteHandler = (req, res) => {
     const id = req.params.id;
     const index = mockData.findIndex(d => d.id === id);
 
@@ -28,7 +28,7 @@ class TodoController {
   /**
    * 修改 todo
    */
-  public updateTodo: RouteMiddleware = (req, res) => {
+  public updateTodo: RouteHandler = (req, res) => {
     const id = req.params.id;
     const index = mockData.findIndex(d => d.id === id);
     const data = JSON.parse(req.body);
@@ -44,10 +44,10 @@ class TodoController {
   /**
    * 新增 todo
    */
-  public addTodo: RouteMiddleware = (req, res) => {
+  public addTodo: RouteHandler = (req, res) => {
     const data = JSON.parse(req.body);
 
-    if (!data || !data.content) {
+    if (!Object.keys(data).length || !data.content) {
       res.status(HttpStatus.BAD_REQUEST).json({ status: 'failed', message: '新增失敗，資料格式有誤' });
       return;
     }
@@ -63,7 +63,7 @@ class TodoController {
   /**
    * 刪除 todo
    */
-  public deleteTodo: RouteMiddleware = (req, res) => {
+  public deleteTodo: RouteHandler = (req, res) => {
     const id = req.params.id;
     const index = mockData.findIndex(d => d.id === id);
 
@@ -78,7 +78,7 @@ class TodoController {
   /**
    * 刪除全部 todo
    */
-  public deleteAllTodo: RouteMiddleware = (_, res) => {
+  public deleteAllTodo: RouteHandler = (_, res) => {
     mockData.length = 0;
     res.status(HttpStatus.OK).json({ status: 'success', data: mockData });
   };
