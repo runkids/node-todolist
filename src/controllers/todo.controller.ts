@@ -1,14 +1,16 @@
-import mockData from '@/mock';
-import { v4 as uuidV4 } from 'uuid';
 import { RouteHandler } from '@/lib/router';
 import { HttpStatus } from '@/config';
+import TodoService from '@/services/todo.service';
 
 class TodoController {
+  private service: TodoService = new TodoService();
+
   /**
    * 取得 todos
    */
   public getAllTodo: RouteHandler = (_, res) => {
-    res.status(HttpStatus.OK).json({ status: 'success', data: mockData });
+    const todos = this.service.getAllTodos();
+    res.status(HttpStatus.OK).json({ status: 'success', data: todos });
   };
 
   /**
@@ -16,10 +18,10 @@ class TodoController {
    */
   public getTodo: RouteHandler = (req, res) => {
     const id = req.params.id;
-    const index = mockData.findIndex(d => d.id === id);
+    const todo = this.service.getTodo(id);
 
-    if (index !== -1) {
-      res.status(HttpStatus.OK).json({ status: 'success', data: mockData[index] });
+    if (todo) {
+      res.status(HttpStatus.OK).json({ status: 'success', data: todo });
     } else {
       res.status(HttpStatus.BAD_REQUEST).json({ status: 'failed', message: `查無此ID：${id}` });
     }
@@ -30,14 +32,18 @@ class TodoController {
    */
   public updateTodo: RouteHandler = (req, res) => {
     const id = req.params.id;
-    const index = mockData.findIndex(d => d.id === id);
     const data = JSON.parse(req.body);
+    if (!data.content) {
+      res.status(HttpStatus.BAD_REQUEST).json({ status: 'failed', message: '資料格式錯誤: 缺少 content' });
+      return;
+    }
 
-    if (index !== -1 && data.content) {
-      mockData[index].content = data.content;
-      res.status(HttpStatus.OK).json({ status: 'success', data: mockData[index] });
+    const todo = this.service.updateTodo(id, data.content);
+
+    if (todo) {
+      res.status(HttpStatus.OK).json({ status: 'success', data: todo });
     } else {
-      res.status(HttpStatus.BAD_REQUEST).json({ status: 'failed', message: data.content ? `查無此ID：${id}` : '資料格式錯誤' });
+      res.status(HttpStatus.BAD_REQUEST).json({ status: 'failed', message: `查無此ID：${id}` });
     }
   };
 
@@ -48,16 +54,13 @@ class TodoController {
     const data = JSON.parse(req.body);
 
     if (!Object.keys(data).length || !data.content) {
-      res.status(HttpStatus.BAD_REQUEST).json({ status: 'failed', message: '新增失敗，資料格式有誤' });
+      res.status(HttpStatus.BAD_REQUEST).json({ status: 'failed', message: '新增失敗，資料格式有誤: 缺少 content' });
       return;
     }
 
-    mockData.push({
-      id: uuidV4(),
-      content: data.content,
-    });
+    const todos = this.service.addTodo(data.content);
 
-    res.status(HttpStatus.OK).json({ status: 'success', message: '新增成功', data: mockData });
+    res.status(HttpStatus.OK).json({ status: 'success', message: '新增成功', data: todos });
   };
 
   /**
@@ -65,11 +68,10 @@ class TodoController {
    */
   public deleteTodo: RouteHandler = (req, res) => {
     const id = req.params.id;
-    const index = mockData.findIndex(d => d.id === id);
+    const todos = this.service.deleteTodo(id);
 
-    if (index !== -1) {
-      mockData.splice(index, 1);
-      res.status(HttpStatus.OK).json({ status: 'success', data: mockData });
+    if (todos) {
+      res.status(HttpStatus.OK).json({ status: 'success', data: todos });
     } else {
       res.status(HttpStatus.BAD_REQUEST).json({ status: 'failed', message: `查無此ID: ${id}` });
     }
@@ -79,8 +81,8 @@ class TodoController {
    * 刪除全部 todo
    */
   public deleteAllTodo: RouteHandler = (_, res) => {
-    mockData.length = 0;
-    res.status(HttpStatus.OK).json({ status: 'success', data: mockData });
+    const todos = this.service.deleteAllTodos();
+    res.status(HttpStatus.OK).json({ status: 'success', data: todos });
   };
 }
 
