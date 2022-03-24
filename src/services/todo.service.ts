@@ -1,18 +1,20 @@
 import { v4 as uuid } from 'uuid';
-import mockData, { Todo } from '@/mock';
+
+export type Todo = { id: string; content: string };
+const todos: Array<Todo> = [];
 
 class TodoService {
   private getTodoIndex(id: string): number {
-    return mockData.findIndex(d => d.id === id);
+    return todos.findIndex(d => d.id === id);
   }
 
   public getAllTodos(): Todo[] {
-    return mockData;
+    return todos;
   }
 
   public getTodo(id: string): Todo | null {
     const index = this.getTodoIndex(id);
-    return index !== -1 ? mockData[index] : null;
+    return index !== -1 ? todos[index] : null;
   }
 
   public addTodo(content: string): Todo {
@@ -20,7 +22,7 @@ class TodoService {
       id: uuid(),
       content,
     };
-    mockData.push(todo);
+    todos.push(todo);
     return todo;
   }
 
@@ -34,16 +36,16 @@ class TodoService {
   public deleteTodo(id: string): Todo[] | null {
     const index = this.getTodoIndex(id);
     if (index !== -1) {
-      mockData.splice(index, 1);
-      return mockData;
+      todos.splice(index, 1);
+      return todos;
     } else {
       return null;
     }
   }
 
   public deleteAllTodos(): Todo[] {
-    mockData.length = 0;
-    return mockData;
+    todos.length = 0;
+    return todos;
   }
 }
 
