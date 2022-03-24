@@ -15,13 +15,13 @@ class TodoService {
     return index !== -1 ? mockData[index] : null;
   }
 
-  public addTodo(content: string): Todo[] {
+  public addTodo(content: string): Todo {
     const todo = {
       id: uuid(),
       content,
     };
     mockData.push(todo);
-    return mockData;
+    return todo;
   }
 
   public updateTodo(id: string, content: string): Todo | null {

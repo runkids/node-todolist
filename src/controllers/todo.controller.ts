@@ -58,9 +58,9 @@ class TodoController {
       return;
     }
 
-    const todos = this.service.addTodo(data.content);
+    const todo = this.service.addTodo(data.content);
 
-    res.status(HttpStatus.OK).json({ status: 'success', message: '新增成功', data: todos });
+    res.status(HttpStatus.CREATED).json({ status: 'success', message: '新增成功', data: todo });
   };
 
   /**
