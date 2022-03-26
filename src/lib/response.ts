@@ -1,16 +1,17 @@
 import { ServerResponse, OutgoingHttpHeaders, OutgoingHttpHeader } from 'http';
 
-let headers: OutgoingHttpHeaders | OutgoingHttpHeader[] = {};
+export let headers: OutgoingHttpHeaders | OutgoingHttpHeader[] = {
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization, Content-Length, X-Requested-With',
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,PATCH,DELETE',
+  'Content-Type': 'application/json',
+};
 
 class Response {
   private res: ServerResponse;
 
   constructor(res: ServerResponse) {
     this.res = res;
-  }
-
-  static initHeaders(setting: Record<string, any>) {
-    headers = setting;
   }
 
   public headers(setting: Record<string, any>) {

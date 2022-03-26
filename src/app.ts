@@ -9,13 +9,6 @@ class App {
   constructor(routes) {
     const router = new Router();
 
-    Response.initHeaders({
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization, Content-Length, X-Requested-With',
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,PATCH,DELETE',
-      'Content-Type': 'application/json',
-    });
-
     //註冊路由
     routes.forEach(Route => {
       new Route(router);
